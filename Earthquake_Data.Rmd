@@ -1,0 +1,169 @@
+---
+title: "Earthquake Data"
+author: "Prajwol Khatri"
+date: "9/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+The data set I am going to look at includes the history of a earthquake. I will be using R to have an overview of Earthquake over the time period. Hence, I will be using several library and statistical model to evalute the trend or perhaps upcoming trend of it. Here, I will be mostly focusing on the magnitude of it.
+
+```{r load the data from the link}
+df <- read.csv("https://raw.githubusercontent.com/khatriprajwol/Earthquake/main/database.csv")
+
+```
+The above link contains its original data where I have taken for this project.
+
+```{r}
+head(df)
+```
+As we know Earthquake is a natural disaster. It claims several lives every year. Therefore, I believe that researching more about it is very much important and worth studying. So it is all about of measuring magnitude because it tells us how much damage it can make. That is higher the magnitude higher the damage. That is why it is crucial to determine how it behaves and what is its nature. So, I will be calculating mean, standard deviation and variance of it. 
+
+```{r}
+mean(df $Magnitude)
+```
+
+```{r}
+sd(df $Magnitude)
+```
+
+```{r}
+var(df $Magnitude)
+```
+
+```{r}
+fivenum(df $Magnitude)
+```
+```{r}
+hist(df $Magnitude, col = "blue")
+```
+```{r}
+boxplot(df $Magnitude, col = "green")
+```
+```{r}
+qqnorm(df $Magnitude, col= "Black")
+qqline(df $Magnitude, col = "red")
+```
+The above data set as we can see did not fall under the red line which means the data is not distributed normally. If the data were on the red line then it would be normally distributed. Here in this case the data is skewed because most of the data were away from the red line. There are two outliers in the top and in the buttom we can see one outlier. 
+```{r}
+cor.test(df$Depth, df$Magnitude, method="pearson")
+```
+As we know correlation coefficient is a value that ranges from -1 to 1.-1 being the perfectly negative association between the two variables and 0 being no association between the two variables and the value of +1 indicates perfectly positive association between two variables.Here two variables are depth and magnitude. Since, in this case the coefficient value is positive this means there is positive correlation between the variables depth and magnitude. If the value was in between 0 to -1 it indicates there is a negative association between the two variable. 
+
+```{r}
+plot(df $Magnitude, df$Depth)
+cor(df $Magnitude, df$Depth)
+
+plot(df$Depth, df$Latitude)
+cor(df$Depth, df$Latitude)
+
+plot(df$Latitude, df$Longitude)
+cor(df$Latitude, df$Longitude)
+
+plot(df$Depth, df$Longitude)
+cor(df$Depth, df$Longitude)
+```
+
+```{r}
+
+rframe <- data.frame( df$Latitude, df$Longitude, df$Magnitude, df$Depth)
+head(rframe)
+
+```
+```{r}
+library(corrplot)
+cor<-cor(rframe)
+corrplot(cor)
+```
+I did not see any strong correlation between the datas however, we can see there is some corelation between latitude and longitude. 
+
+```{r}
+
+factor(df $Magnitude[1:300])
+
+```
+
+```{r}
+table(df $Magnitude[1:300])
+```
+```{r}
+#install.packages("epiDisplay")
+library("epiDisplay")
+tab1(df$Magnitude[1:600], sort.group = "decreasing", cum.percent =TRUE)
+```
+This representation gives us a highly featured report of my data set that includes descriptive statistics functions like absolute frequency, cumulative frequencies and proportions. If, for instance, we wish to know what percentage of magnitude 5.7 earthquakes or what fraction of earthquake have magnitude 7 is recorded then this method allows us to get your answer using the same report.It makes our data evaluations easy and what it is trying to show. 
+
+```{r}
+rf <- data.frame(Type =c( 'Earthquake', 'Nuclear Explosion'),
+                 Status= c('Automatic', 'Reviewed'), 
+                 Magnitude = (6:9))
+                
+```
+```{r}
+data <- table(rf $Type, rf$Status, rf$Magnitude)
+```
+
+```{r}
+data
+```
+From the above data we can see even in a nuclear explosion, 9 magnitude, 7 magnitude is recorded by the machine which was not due to earthquake. It shows us that there are several factor that can affect the Magnitude which in this case is nuclear explosion. 
+Also, I have found that Magnitude error was recorded when there was a nuclear explosion.
+
+```{r}
+new<-data.frame(table(df$Magnitude))
+```
+```{r}
+head(new)
+```
+```{r}
+plot(new$Var1, new$Freq)
+```
+```{r}
+plot.default(df $Depth, col="purple")
+```
+```{r}
+#install.packages('epiDisplay')
+library(epiDisplay)
+tab1(df $Depth[1:300], sort.group = "decreasing", cum.percent =TRUE)
+```
+```{r}
+plot(df$Magnitude.Error, col = "Blue")
+```
+Here we can see the graphical representation of Magnitude Error. Some of the data are skewed but some are in one place.
+```{r}
+plot(df$Depth.Error, col="Orange")
+```
+```{r}
+#install.packages("maptools")
+#install.packages(ggplot)
+library("ggmap")
+library(maptools)
+library(maps)
+mapWorld <- borders("world", colour="black", fill="white")
+mp <- ggplot() + mapWorld
+mp <- mp + geom_point(data = df, aes(x = Longitude, y = Latitude, color = Status, size = Magnitude), alpha = 0.2)
+mp
+```
+```{r}
+mp <- mp + geom_point(data = df, aes(x = Longitude, y = Latitude, color =Type, size = Magnitude), alpha = 0.2)
+mp
+```
+In Conclusion, higher magnitude earthquake is recorded over the time period compared to the past. We can also see it in the graph of magnitude. This data gives an over view of an Earthquake that has been recorded over the time. 
+
+
+```{r}
+library(rpart)
+
+tree <- rpart( Status ~.,data = df)
+head(tree)
+```
+```{r}
+library(rpart.plot)
+rpart.plot(tree, extra = 2)
+```
+
+
+
+
